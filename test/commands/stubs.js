@@ -1,4 +1,4 @@
-import { GITMOJIS_URL } from "../../src/utils/configurationVault"
+import { GITMOJIS_URL } from '../../src/utils/configurationVault'
 
 export const gitmojis = [
   {
@@ -22,6 +22,8 @@ export const configAnswers = {
   emojiFormat: 'emoji',
   signedCommit: true,
   scopePrompt: false,
+  messagePrompt: true,
+  capitalizeTitle: true,
   gitmojisUrl: GITMOJIS_URL
 }
 
@@ -40,8 +42,8 @@ export const commitTitleInvalid = 'Invalid commit `title'
 
 export const clientCommitAnswers = {
   gitmoji: ':zap:',
-  title: 'Improving performance issues.',
-  message: 'Refactored code. Fixes #5'
+  title: '"Improving performance issues."',
+  message: '"Refactored code. Fixes #5"'
 }
 
 export const clientCommitAnswersWithScope = {
@@ -60,3 +62,15 @@ export const defaultCommitContent = {
   title: 'commit title',
   message: 'commit message'
 }
+
+export const gitmojiShortcodeCommitContent = {
+  title: ':zap: commit title',
+  message: 'commit message'
+}
+
+export const gitmojiUnicodeCommitContent = {
+  title: '🔥 commit title',
+  message: 'commit message'
+}
+
+export const url = 'https://carloscuesta.me'

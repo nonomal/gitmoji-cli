@@ -1,11 +1,12 @@
 import inquirer from 'inquirer'
 
-import config from '../../src/commands/config'
-import configurationPrompts from '../../src/commands/config/prompts'
-import configurationVault from '../../src/utils/configurationVault'
+import config from '@commands/config'
+import configurationPrompts from '@commands/config/prompts'
+import guard from '@commands/config/guard'
+import configurationVault from '@utils/configurationVault'
 import * as stubs from './stubs'
 
-jest.mock('../../src/utils/configurationVault')
+jest.mock('@utils/configurationVault')
 
 describe('config command', () => {
   beforeAll(() => {
@@ -24,14 +25,33 @@ describe('config command', () => {
     expect(configurationVault.setEmojiFormat).toHaveBeenCalledWith(
       stubs.configAnswers.emojiFormat
     )
-    expect(configurationVault.setSignedCommit).toHaveBeenCalledWith(
-      stubs.configAnswers.signedCommit
-    )
     expect(configurationVault.setScopePrompt).toHaveBeenCalledWith(
       stubs.configAnswers.scopePrompt
+    )
+    expect(configurationVault.setMessagePrompt).toHaveBeenCalledWith(
+      stubs.configAnswers.messagePrompt
+    )
+    expect(configurationVault.setCapitalizeTitle).toHaveBeenCalledWith(
+      stubs.configAnswers.capitalizeTitle
     )
     expect(configurationVault.setGitmojisUrl).toHaveBeenCalledWith(
       stubs.configAnswers.gitmojisUrl
     )
+  })
+
+  describe('guard', () => {
+    it('should match guard', () => {
+      expect(guard).toMatchSnapshot()
+    })
+
+    describe('title', () => {
+      it('should return true when valid', () => {
+        expect(guard.url(stubs.url)).toBe(true)
+      })
+
+      it('should return error message when empty', () => {
+        expect(guard.url('')).toEqual(expect.any(String))
+      })
+    })
   })
 })

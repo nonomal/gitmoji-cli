@@ -1,24 +1,18 @@
 // @flow
 import inquirer from 'inquirer'
 
-import configurationPrompts, { CONFIGURATION_PROMPT_NAMES } from './prompts'
-import configurationVault from '../../utils/configurationVault'
+import configurationPrompts from './prompts'
+import { CONFIG } from '@constants/configuration'
+import configurationVault from '@utils/configurationVault'
 
 const config = () => {
   inquirer.prompt(configurationPrompts()).then((answers) => {
-    configurationVault.setAutoAdd(answers[CONFIGURATION_PROMPT_NAMES.AUTO_ADD])
-    configurationVault.setEmojiFormat(
-      answers[CONFIGURATION_PROMPT_NAMES.EMOJI_FORMAT]
-    )
-    configurationVault.setSignedCommit(
-      answers[CONFIGURATION_PROMPT_NAMES.SIGNED_COMMIT]
-    )
-    configurationVault.setScopePrompt(
-      answers[CONFIGURATION_PROMPT_NAMES.SCOPE_PROMPT]
-    )
-    configurationVault.setGitmojisUrl(
-      answers[CONFIGURATION_PROMPT_NAMES.GITMOJIS_URL]
-    )
+    configurationVault.setAutoAdd(answers[CONFIG.AUTO_ADD])
+    configurationVault.setEmojiFormat(answers[CONFIG.EMOJI_FORMAT])
+    configurationVault.setScopePrompt(answers[CONFIG.SCOPE_PROMPT])
+    configurationVault.setMessagePrompt(answers[CONFIG.MESSAGE_PROMPT])
+    configurationVault.setCapitalizeTitle(answers[CONFIG.CAPITALIZE_TITLE])
+    configurationVault.setGitmojisUrl(answers[CONFIG.GITMOJIS_URL])
   })
 }
 

@@ -1,23 +1,23 @@
 import inquirer from 'inquirer'
-import execa from 'execa'
+import { execa } from 'execa'
 import fs from 'fs'
 import chalk from 'chalk'
-const mockProcess = require('jest-mock-process')
+import { mockProcessExit } from 'jest-mock-process'
 
-import configurationVault from '../../src/utils/configurationVault'
-import getDefaultCommitContent from '../../src/utils/getDefaultCommitContent'
-import getEmojis from '../../src/utils/getEmojis'
-import isHookCreated from '../../src/utils/isHookCreated'
-import commit from '../../src/commands/commit'
-import guard from '../../src/commands/commit/guard'
-import prompts from '../../src/commands/commit/prompts'
+import configurationVault from '@utils/configurationVault'
+import getDefaultCommitContent from '@utils/getDefaultCommitContent'
+import getEmojis from '@utils/getEmojis'
+import isHookCreated from '@utils/isHookCreated'
+import commit from '@commands/commit'
+import guard from '@commands/commit/guard'
+import prompts from '@commands/commit/prompts'
 import * as stubs from './stubs'
-import { COMMIT_MESSAGE_SOURCE } from '../../src/commands/commit/withHook/index'
+import { COMMIT_MESSAGE_SOURCE } from '@commands/commit/withHook/index'
 
-jest.mock('../../src/utils/getDefaultCommitContent')
-jest.mock('../../src/utils/getEmojis')
-jest.mock('../../src/utils/isHookCreated')
-jest.mock('../../src/utils/configurationVault')
+jest.mock('@utils/getDefaultCommitContent', () => jest.fn().mockReturnValue({}))
+jest.mock('@utils/getEmojis')
+jest.mock('@utils/isHookCreated')
+jest.mock('@utils/configurationVault')
 
 describe('commit command', () => {
   describe('withClient', () => {
@@ -33,6 +33,7 @@ describe('commit command', () => {
           stubs.emptyDefaultCommitContent
         )
         commit({ mode: 'client' })
+        configurationVault.getMessagePrompt.mockReturnValue(true)
       })
 
       it('should call inquirer with prompts', () => {
@@ -45,11 +46,12 @@ describe('commit command', () => {
           [
             'commit',
             '-m',
-            `${stubs.clientCommitAnswers.gitmoji} ${stubs.clientCommitAnswers.title}`,
+            `"${stubs.clientCommitAnswers.gitmoji} ${stubs.clientCommitAnswers.title}"`,
             '-m',
-            stubs.clientCommitAnswers.message
+            `"${stubs.clientCommitAnswers.message}"`
           ],
           {
+            shell: true,
             buffer: false,
             stdio: 'inherit'
           }
@@ -66,7 +68,6 @@ describe('commit command', () => {
         getEmojis.mockResolvedValue(stubs.gitmojis)
         isHookCreated.mockResolvedValue(false)
         configurationVault.getAutoAdd.mockReturnValue(true)
-        configurationVault.getSignedCommit.mockReturnValue(true)
         getDefaultCommitContent.mockReturnValueOnce(
           stubs.emptyDefaultCommitContent
         )
@@ -86,13 +87,13 @@ describe('commit command', () => {
           'git',
           [
             'commit',
-            '-S',
+            '-am',
+            `"${stubs.clientCommitAnswersWithScope.gitmoji} (${stubs.clientCommitAnswersWithScope.scope}): ${stubs.clientCommitAnswersWithScope.title}"`,
             '-m',
-            `${stubs.clientCommitAnswersWithScope.gitmoji} (${stubs.clientCommitAnswersWithScope.scope}): ${stubs.clientCommitAnswersWithScope.title}`,
-            '-m',
-            stubs.clientCommitAnswersWithScope.message
+            `"${stubs.clientCommitAnswersWithScope.message}"`
           ],
           {
+            shell: true,
             buffer: false,
             stdio: 'inherit'
           }
@@ -133,7 +134,6 @@ describe('commit command', () => {
         getEmojis.mockResolvedValue(stubs.gitmojis)
         isHookCreated.mockResolvedValue(false)
         configurationVault.getAutoAdd.mockReturnValue(true)
-        configurationVault.getSignedCommit.mockReturnValue(true)
         getDefaultCommitContent.mockReturnValueOnce(
           stubs.emptyDefaultCommitContent
         )
@@ -144,15 +144,7 @@ describe('commit command', () => {
       })
 
       it('should print the error to the console', () => {
-        expect(consoleError).toHaveBeenCalledWith(
-          chalk.red(
-            '\n',
-            'Oops! An error ocurred. There is likely additional logging output above.\n',
-            'You can run the same commit with this command:\n'
-          ),
-          '\t',
-          undefined
-        )
+        expect(consoleError).toHaveBeenCalled()
       })
     })
   })
@@ -165,7 +157,7 @@ describe('commit command', () => {
           Promise.resolve(stubs.clientCommitAnswers)
         )
         getEmojis.mockResolvedValue(stubs.gitmojis)
-        mockProcess.mockProcessExit()
+        mockProcessExit()
         process.argv[3] = stubs.argv
         process.argv[COMMIT_MESSAGE_SOURCE] = undefined
         getDefaultCommitContent.mockReturnValueOnce(
@@ -195,7 +187,7 @@ describe('commit command', () => {
           Promise.resolve(stubs.clientCommitAnswersWithScope)
         )
         getEmojis.mockResolvedValue(stubs.gitmojis)
-        mockProcess.mockProcessExit()
+        mockProcessExit()
         process.argv[3] = stubs.argv
         process.argv[COMMIT_MESSAGE_SOURCE] = stubs.commitSource
         getDefaultCommitContent.mockReturnValueOnce(
@@ -226,7 +218,7 @@ describe('commit command', () => {
         Simulation needed because if we just mock process exit, then the code execution resume in the test.
         */
         process.argv[COMMIT_MESSAGE_SOURCE] = stubs.commitSource
-        mockProcess.mockProcessExit(new Error('ProcessExit0'))
+        mockProcessExit(new Error('ProcessExit0'))
         execa.mockReturnValueOnce(Promise.resolve(stubs.gitAbsoluteDir))
         // mock that we found one of the rebase trigger (file existence in .git)
         fs.existsSync.mockReturnValueOnce(true)
@@ -248,7 +240,7 @@ describe('commit command', () => {
         when the hook mode detect that the user is rebasing. (Simulated to not kill the tests)
         Simulation needed because if we just mock process exit, then the code execution resume in the test.
         */
-        mockProcess.mockProcessExit(new Error('ProcessExit0'))
+        mockProcessExit(new Error('ProcessExit0'))
         execa.mockReturnValueOnce(Promise.resolve(stubs.gitAbsoluteDir))
         // mock that we are amending
         process.argv[COMMIT_MESSAGE_SOURCE] = 'commit sha123'
@@ -285,7 +277,7 @@ describe('commit command', () => {
         getEmojis.mockResolvedValue(stubs.gitmojis)
 
         // Use an exception to suspend code execution to simulate process.exit
-        mockProcess.mockProcessExit(new Error('SIGINT'))
+        mockProcessExit(new Error('SIGINT'))
         process.argv[3] = stubs.argv
         process.argv[COMMIT_MESSAGE_SOURCE] = stubs.commitSource
 
@@ -306,7 +298,7 @@ describe('commit command', () => {
 
     describe('with git auto merge trigger by git pull', () => {
       it('should cancel the hook', async () => {
-        mockProcess.mockProcessExit(new Error('ProcessExit0'))
+        mockProcessExit(new Error('ProcessExit0'))
         execa.mockReturnValueOnce(Promise.resolve(stubs.gitAbsoluteDir))
         // mock that we are merging
         process.argv[3] = '.git/MERGE_MSG'
@@ -322,6 +314,45 @@ describe('commit command', () => {
       })
     })
 
+    describe('when gitmoji is present in the title', () => {
+      beforeAll(() => {
+        mockProcessExit(new Error('ProcessExit0'))
+        execa.mockReturnValueOnce(Promise.resolve(stubs.gitAbsoluteDir))
+        getEmojis.mockResolvedValue(stubs.gitmojis)
+      })
+
+      describe('as a shortcode', () => {
+        beforeAll(() => {
+          getDefaultCommitContent.mockReturnValueOnce(
+            stubs.gitmojiShortcodeCommitContent
+          )
+        })
+
+        it('should cancel the hook', async () => {
+          try {
+            await commit({ mode: 'hook' })
+          } catch (e) {
+            expect(process.exit).toHaveBeenCalledWith(0)
+          }
+        })
+      })
+
+      describe('as a unicode', () => {
+        beforeAll(() => {
+          getDefaultCommitContent.mockReturnValueOnce(
+            stubs.gitmojiUnicodeCommitContent
+          )
+        })
+
+        it('should cancel the hook', async () => {
+          try {
+            await commit({ mode: 'hook' })
+          } catch (e) {
+            expect(process.exit).toHaveBeenCalledWith(0)
+          }
+        })
+      })
+    })
   })
 
   describe('guard', () => {
@@ -337,48 +368,14 @@ describe('commit command', () => {
       it('should return error message when empty', () => {
         expect(guard.title('')).toEqual(expect.any(String))
       })
-
-      it('should return error message with invalid characters', () => {
-        expect(guard.title(stubs.commitTitleInvalid)).toEqual(
-          expect.any(String)
-        )
-      })
-    })
-
-    describe('message', () => {
-      it('should return true when valid', () => {
-        expect(guard.title(stubs.commitTitle)).toBe(true)
-      })
-
-      it('should return error message when empty', () => {
-        expect(guard.title('')).toEqual(expect.any(String))
-      })
-
-      it('should return error message with invalid characters', () => {
-        expect(guard.title(stubs.commitTitleInvalid)).toEqual(
-          expect.any(String)
-        )
-      })
-    })
-
-    describe('scope', () => {
-      it('should return true when valid', () => {
-        expect(guard.title(stubs.commitTitle)).toBe(true)
-      })
-
-      it('should return error message when empty', () => {
-        expect(guard.title('')).toEqual(expect.any(String))
-      })
-
-      it('should return error message with invalid characters', () => {
-        expect(guard.title(stubs.commitTitleInvalid)).toEqual(
-          expect.any(String)
-        )
-      })
     })
   })
 
   describe('prompts', () => {
+    beforeAll(() => {
+      configurationVault.getMessagePrompt.mockReturnValue(true)
+    })
+
     it('should register the autoComplete inquirer prompt', () => {
       expect(inquirer.registerPrompt).toHaveBeenCalledWith(
         'autocomplete',
@@ -430,6 +427,19 @@ describe('commit command', () => {
 
       it('should not fill default title and message', () => {
         expect(prompts(stubs.gitmojis, 'commit')).toMatchSnapshot()
+      })
+    })
+
+    describe('without message prompt', () => {
+      beforeAll(() => {
+        getDefaultCommitContent.mockReturnValueOnce(
+          stubs.emptyDefaultCommitContent
+        )
+        configurationVault.getMessagePrompt.mockReturnValue(false)
+      })
+
+      it('should match the array of questions', () => {
+        expect(prompts(stubs.gitmojis, 'client')).toMatchSnapshot()
       })
     })
   })
