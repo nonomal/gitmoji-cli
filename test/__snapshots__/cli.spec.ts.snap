@@ -1,11 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`cli should match meow with cli information 1`] = `
-Array [
-  Array [
+[
+  [
     "
   Usage
-    $ gitmoji
+    $ gitmoji [option] [command]
   Options
     --commit, -c    Interactively commit using the prompts
     --config, -g    Setup gitmoji-cli preferences.
@@ -15,49 +15,58 @@ Array [
     --search, -s    Search gitmojis
     --update, -u    Sync emoji list with the repo
     --version, -v   Print gitmoji-cli installed version
+  Commands
+    commit          Interactively commit using the prompts
+    config          Setup gitmoji-cli preferences.
+    init            Initialize gitmoji as a commit hook
+    list            List all the available gitmojis
+    remove          Remove a previously initialized commit hook
+    search          Search gitmojis
+    update          Sync emoji list with the repo
   Examples
     $ gitmoji -l
     $ gitmoji bug linter -s
 ",
-    Object {
-      "flags": Object {
-        "commit": Object {
-          "alias": "c",
+    {
+      "flags": {
+        "commit": {
+          "shortFlag": "c",
           "type": "boolean",
         },
-        "config": Object {
-          "alias": "g",
+        "config": {
+          "shortFlag": "g",
           "type": "boolean",
         },
-        "help": Object {
-          "alias": "h",
+        "help": {
+          "shortFlag": "h",
           "type": "boolean",
         },
-        "init": Object {
-          "alias": "i",
+        "init": {
+          "shortFlag": "i",
           "type": "boolean",
         },
-        "list": Object {
-          "alias": "l",
+        "list": {
+          "shortFlag": "l",
           "type": "boolean",
         },
-        "remove": Object {
-          "alias": "r",
+        "remove": {
+          "shortFlag": "r",
           "type": "boolean",
         },
-        "search": Object {
-          "alias": "s",
+        "search": {
+          "shortFlag": "s",
           "type": "boolean",
         },
-        "update": Object {
-          "alias": "u",
+        "update": {
+          "shortFlag": "u",
           "type": "boolean",
         },
-        "version": Object {
-          "alias": "v",
+        "version": {
+          "shortFlag": "v",
           "type": "boolean",
         },
       },
+      "importMeta": "import.meta.url",
     },
   ],
 ]

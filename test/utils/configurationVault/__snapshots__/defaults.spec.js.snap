@@ -1,16 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`configurationVault should match the module 1`] = `
-Object {
+exports[`index should match the module 1`] = `
+{
   "getAutoAdd": [Function],
+  "getCapitalizeTitle": [Function],
   "getEmojiFormat": [Function],
   "getGitmojisUrl": [Function],
+  "getMessagePrompt": [Function],
   "getScopePrompt": [Function],
-  "getSignedCommit": [Function],
   "setAutoAdd": [Function],
+  "setCapitalizeTitle": [Function],
   "setEmojiFormat": [Function],
   "setGitmojisUrl": [Function],
+  "setMessagePrompt": [Function],
   "setScopePrompt": [Function],
-  "setSignedCommit": [Function],
 }
 `;

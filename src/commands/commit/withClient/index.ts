@@ -1,17 +1,15 @@
-// @flow
-import execa from 'execa'
-import fs from 'fs'
+import { execa } from 'execa'
 import chalk from 'chalk'
 
-import isHookCreated from '../../../utils/isHookCreated'
-import configurationVault from '../../../utils/configurationVault'
-import { type Answers } from '../prompts'
+import isHookCreated from '@utils/isHookCreated.js'
+import configurationVault from '@utils/configurationVault/index.js'
+import { type Answers } from '../prompts.js'
 
 const withClient = async (answers: Answers): Promise<void> => {
   try {
     const scope = answers.scope ? `(${answers.scope}): ` : ''
-    const title = `${answers.gitmoji} ${scope}${answers.title}`
-    const isSigned = configurationVault.getSignedCommit() ? ['-S'] : []
+    const title = `"${answers.gitmoji} ${scope}${answers.title}"`
+    const isAutoAddEnabled = configurationVault.getAutoAdd()
 
     if (await isHookCreated()) {
       return console.log(
@@ -24,12 +22,18 @@ const withClient = async (answers: Answers): Promise<void> => {
       )
     }
 
-    if (configurationVault.getAutoAdd()) await execa('git', ['add', '.'])
+    if (isAutoAddEnabled) await execa('git', ['add', '.'])
 
     await execa(
       'git',
-      ['commit', ...isSigned, '-m', title, '-m', answers.message],
+      [
+        'commit',
+        isAutoAddEnabled ? '-am' : '-m',
+        title,
+        ...(answers.message ? ['-m', `"${answers.message}"`] : [])
+      ],
       {
+        shell: true,
         buffer: false,
         stdio: 'inherit'
       }
@@ -37,12 +41,10 @@ const withClient = async (answers: Answers): Promise<void> => {
   } catch (error) {
     console.error(
       chalk.red(
-        '\n',
-        'Oops! An error ocurred. There is likely additional logging output above.\n',
-        'You can run the same commit with this command:\n'
-      ),
-      '\t',
-      error.escapedCommand
+        error,
+        '\n\n',
+        'Oops! An error occurred. There is likely additional logging output above.\n'
+      )
     )
   }
 }

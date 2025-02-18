@@ -1,52 +1,48 @@
 // @flow
-import configurationVault from '../../utils/configurationVault'
-
-export const CONFIGURATION_PROMPT_NAMES = {
-  AUTO_ADD: 'autoAdd',
-  EMOJI_FORMAT: 'emojiFormat',
-  SCOPE_PROMPT: 'scopePrompt',
-  SIGNED_COMMIT: 'signedCommit',
-  GITMOJIS_URL: 'gitmojisUrl'
-}
-
-export const EMOJI_COMMIT_FORMATS = {
-  CODE: 'code',
-  EMOJI: 'emoji'
-}
+import configurationVault from '@utils/configurationVault'
+import { CONFIG, EMOJI_COMMIT_FORMATS } from '@constants/configuration'
+import guard from './guard'
 
 export default (): Array<Object> => [
   {
-    name: CONFIGURATION_PROMPT_NAMES.AUTO_ADD,
+    name: CONFIG.AUTO_ADD,
     message: 'Enable automatic "git add ."',
     type: 'confirm',
     default: configurationVault.getAutoAdd()
   },
   {
-    name: CONFIGURATION_PROMPT_NAMES.EMOJI_FORMAT,
+    name: CONFIG.EMOJI_FORMAT,
     message: 'Select how emojis should be used in commits',
     type: 'list',
     choices: [
-      { name: ':smile:', value: EMOJI_COMMIT_FORMATS.CODE },
-      { name: '😄', value: EMOJI_COMMIT_FORMATS.EMOJI }
+      { name: '😄', value: EMOJI_COMMIT_FORMATS.EMOJI },
+      { name: ':smile:', value: EMOJI_COMMIT_FORMATS.CODE }
     ],
     default: configurationVault.getEmojiFormat()
   },
   {
-    name: CONFIGURATION_PROMPT_NAMES.SIGNED_COMMIT,
-    message: 'Enable signed commits',
-    type: 'confirm',
-    default: configurationVault.getSignedCommit()
-  },
-  {
-    name: CONFIGURATION_PROMPT_NAMES.SCOPE_PROMPT,
+    name: CONFIG.SCOPE_PROMPT,
     message: 'Enable scope prompt',
     type: 'confirm',
     default: configurationVault.getScopePrompt()
   },
   {
-    name: CONFIGURATION_PROMPT_NAMES.GITMOJIS_URL,
+    name: CONFIG.MESSAGE_PROMPT,
+    message: 'Enable message prompt',
+    type: 'confirm',
+    default: configurationVault.getMessagePrompt()
+  },
+  {
+    name: CONFIG.CAPITALIZE_TITLE,
+    message: 'Capitalize title',
+    type: 'confirm',
+    default: configurationVault.getCapitalizeTitle()
+  },
+  {
+    name: CONFIG.GITMOJIS_URL,
     message: 'Set gitmojis api url',
     type: 'input',
-    default: configurationVault.getGitmojisUrl()
+    default: configurationVault.getGitmojisUrl(),
+    validate: guard.url
   }
 ]

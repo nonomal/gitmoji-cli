@@ -1,15 +1,16 @@
 // @flow
 import inquirer from 'inquirer'
+import inquirerAutocompletePrompt from 'inquirer-autocomplete-prompt'
 
-import configurationVault from '../../utils/configurationVault'
-import filterGitmojis from '../../utils/filterGitmojis'
-import getDefaultCommitContent from '../../utils/getDefaultCommitContent'
-import { type CommitOptions } from './index'
+import configurationVault from '@utils/configurationVault'
+import filterGitmojis from '@utils/filterGitmojis'
+import getDefaultCommitContent from '@utils/getDefaultCommitContent'
+import { type CommitOptions, capitalizeTitle } from '.'
 import guard from './guard'
 
 const TITLE_MAX_LENGTH_COUNT: number = 48
 
-inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'))
+inquirer.registerPrompt('autocomplete', inquirerAutocompletePrompt)
 
 export type Gitmoji = {
   code: string,
@@ -20,12 +21,15 @@ export type Gitmoji = {
 
 export type Answers = {
   gitmoji: string,
-  scope?: string,
+  scope: ?string,
   title: string,
-  message: string
+  message: ?string
 }
 
-export default (gitmojis: Array<Gitmoji>, options: CommitOptions): Array<Object> => {
+export default (
+  gitmojis: Array<Gitmoji>,
+  options: CommitOptions
+): Array<Object> => {
   const { title, message, scope } = getDefaultCommitContent(options)
 
   return [
@@ -47,7 +51,6 @@ export default (gitmojis: Array<Gitmoji>, options: CommitOptions): Array<Object>
           {
             name: 'scope',
             message: 'Enter the scope of current changes:',
-            validate: guard.scope,
             ...(scope ? { default: scope } : {})
           }
         ]
@@ -57,17 +60,24 @@ export default (gitmojis: Array<Gitmoji>, options: CommitOptions): Array<Object>
       message: 'Enter the commit title',
       validate: guard.title,
       transformer: (input: string) => {
-        return `[${
-          (title || input).length
-        }/${TITLE_MAX_LENGTH_COUNT}]: ${input}`
+        const length = (title || input).length.toString().padStart(2, '0');
+        
+        return `[${length}/${TITLE_MAX_LENGTH_COUNT}]: ${
+          configurationVault.getCapitalizeTitle()
+            ? capitalizeTitle(input)
+            : input
+        }`
       },
       ...(title ? { default: title } : {})
     },
-    {
-      name: 'message',
-      message: 'Enter the commit message:',
-      validate: guard.message,
-      ...(message ? { default: message } : {})
-    }
+    ...(configurationVault.getMessagePrompt()
+      ? [
+          {
+            name: 'message',
+            message: 'Enter the commit message:',
+            ...(message ? { default: message } : {})
+          }
+        ]
+      : [])
   ]
 }

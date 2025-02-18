@@ -1,6 +1,6 @@
 # gitmoji-cli
 
-[![Build Status](https://img.shields.io/github/workflow/status/carloscuesta/gitmoji-cli/CI?style=flat-square)](https://github.com/carloscuesta/gitmoji-cli/actions?query=workflow%3ACI+branch%3Amaster)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/carloscuesta/gitmoji-cli/ci.yml?branch=master&style=flat-square)](https://github.com/carloscuesta/gitmoji-cli/actions?query=workflow%3ACI+branch%3Amaster)
 [![Code Climate](https://img.shields.io/codeclimate/maintainability/carloscuesta/gitmoji-cli.svg?style=flat-square)](https://codeclimate.com/github/carloscuesta/gitmoji-cli)
 [![Codecov](https://img.shields.io/codecov/c/github/carloscuesta/gitmoji-cli.svg?style=flat-square)](https://github.com/carloscuesta/gitmoji-cli)
 [![npm version](https://img.shields.io/npm/v/gitmoji-cli.svg?style=flat-square)](https://www.npmjs.com/package/gitmoji-cli)
@@ -124,14 +124,52 @@ gitmoji -u
 
 ### Config
 
+The cli has some built-in configuration options that you can tweak at your own preference:
+
+- **Automatic git add**: Enable or disable the automatic `git add .` every time you use the commit command.
+- **Emoji format**: Switch between the emoji format.
+- **Message prompt**: Enable or disable the message prompt.
+- **Scope prompt**: Enable or disable [conventional commits scope prompt](https://www.conventionalcommits.org/en/v1.0.0/#summary).
+- **Gitmojis api URL**: Set a custom URL to use it as the library of gitmojis.
+
+You can configure these options via (in order of precedence):
+
+- A `gitmoji` key in your `package.json` file
+- A `.gitmojirc.json` file.
+- Using the global cli configuration.
+
+If no user configuration is found, a set of default values will be used.
+
+#### `package.json`
+
+```json
+{
+  "gitmoji": {
+    "autoAdd": false,
+    "emojiFormat": "code | emoji",
+    "scopePrompt": false,
+    "messagePrompt": false,
+    "capitalizeTitle": true,
+    "gitmojisUrl": "https://gitmoji.dev/api/gitmojis"
+  }
+}
+```
+
+#### `.gitmojirc.json`
+
+```json
+{
+  "autoAdd": false,
+  "emojiFormat": "code | emoji" ,
+  "scopePrompt": false,
+  "messagePrompt": false,
+  "capitalizeTitle": true,
+  "gitmojisUrl": "https://gitmoji.dev/api/gitmojis"
+}
+```
+
+#### Local configuration
+
 Run `gitmoji -g` to setup some gitmoji-cli preferences.
 
 ![gitmoji config](https://user-images.githubusercontent.com/7629661/41189876-d21167ee-6bd4-11e8-9008-4c987502f307.png)
-
-#### Options
-
-- **Automatic git add**: Enable or disable the automatic `git add .` everytime you use the commit command.
-- **Emoji format**: Switch between the emoji format.
-- **Scope prompt**: Enable or disable [conventional commits scope prompt](https://www.conventionalcommits.org/en/v1.0.0/#summary).
-- **Signed commits**: Enable or disable [signed commits with GPG](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/signing-commits).
-- **Gitmojis api URL**: Set a custom URL to use it as the library of gitmojis.

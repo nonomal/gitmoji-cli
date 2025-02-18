@@ -9,7 +9,8 @@ export const commands = [
   'update'
 ]
 
-export const cliMock = (options) => ({
+export const cliMock = (options, input?: string[]) => ({
+  input: input || [],
   flags: {
     commit: options.commit || false,
     config: options.config || false,
@@ -416,3 +417,5 @@ export const relativeCoreHooksPath = '.git/hooks'
 
 export const hooksPath =
   '/Users/carloscuesta/GitHub/gitmoji-cli/.git/hooks/prepare-commit-msg'
+
+export const searchQuery = 'LoVe'

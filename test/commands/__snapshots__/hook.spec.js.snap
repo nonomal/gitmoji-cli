@@ -1,19 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`hook command should match hook configuration 1`] = `
-Object {
-  "CONTENTS": "#!/bin/sh
+{
+  "CONTENTS": "#!/usr/bin/env bash
 # gitmoji as a commit hook
-exec < /dev/tty
-gitmoji --hook $1 $2
-",
+if npx -v >&/dev/null
+then
+  exec < /dev/tty
+  npx -c "gitmoji --hook $1 $2"
+else
+  exec < /dev/tty
+  gitmoji --hook $1 $2
+fi",
   "FILENAME": "prepare-commit-msg",
   "PERMISSIONS": 509,
 }
 `;
 
 exports[`hook command should match hook module export 1`] = `
-Object {
+{
   "create": [Function],
   "remove": [Function],
 }
